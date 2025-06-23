@@ -1,10 +1,7 @@
 from langchain_core.messages import HumanMessage
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 import json
-from dotenv import load_dotenv
-load_dotenv()
-import os
 
 def chat_node(state):
     # llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434")
