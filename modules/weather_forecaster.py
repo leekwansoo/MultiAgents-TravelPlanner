@@ -1,8 +1,10 @@
 from langchain_core.messages import HumanMessage
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 
 def weather_forecaster(state):
-    llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434")
+    # llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434")
+    llm = ChatOpenAI(model="gpt-4o")
     prompt = f"""
     Based on the destination and month, provide a detailed weather forecast including temperature, precipitation, and advice for travelers:
     Destination: {state['preferences'].get('destination', '')}
