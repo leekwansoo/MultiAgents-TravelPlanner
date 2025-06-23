@@ -3,7 +3,8 @@ import json
 from typing import TypedDict, Annotated
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from dotenv import load_dotenv
 import os
@@ -22,7 +23,8 @@ load_dotenv()
 # Initialize LLM
 st.set_page_config(page_title="AI Travel Planner", layout="wide")
 try:
-    llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434")
+    #llm = ChatOllama(model="llama3.2", base_url="http://localhost:11434")
+    llm = ChatOpenAI(model="gpt-4o")
 except Exception as e:
     st.error(f"LLM initialization failed: {str(e)}")
     st.stop()
