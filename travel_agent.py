@@ -1,9 +1,7 @@
 import streamlit as st
 from datetime import date
 import json
-from typing import TypedDict, Annotated
-from langgraph.graph import StateGraph, END
-from langchain_core.messages import HumanMessage
+
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from langchain_community.utilities import GoogleSerperAPIWrapper
@@ -16,6 +14,7 @@ from modules import weather_forecaster
 from modules import packing_list_generator
 from modules import food_culture_recommender
 from modules import chat_agent
+from modules.generate_graph import create_graph
 from utils_export import export_to_pdf
 
 # Load environment variables
@@ -37,39 +36,9 @@ except Exception as e:
     st.error(f"Serper API initialization failed: {str(e)}")
     st.stop()
 
-# Define state
-class GraphState(TypedDict):
-    preferences_text: str
-    preferences: dict
-    itinerary: str
-    activity_suggestions: str
-    useful_links: list[dict]
-    weather_forecast: str
-    packing_list: str
-    food_culture_info: str
-    chat_history: Annotated[list[dict], "List of question-response pairs"]
-    user_question: str
-    chat_response: str
+# --- LangGraph from generate_graph.py-------------------
 
-# ------------------- LangGraph -------------------
-
-workflow = StateGraph(GraphState)
-workflow.add_node("generate_itinerary", generate_itinerary.generate_itinerary)
-workflow.add_node("recommend_activities", recommend_activities.recommend_activities)
-workflow.add_node("fetch_useful_links", fetch_useful_links.fetch_useful_links)
-workflow.add_node("weather_forecaster", weather_forecaster.weather_forecaster)
-workflow.add_node("packing_list_generator", packing_list_generator.packing_list_generator)
-workflow.add_node("food_culture_recommender", food_culture_recommender.food_culture_recommender)
-workflow.add_node("chat", chat_agent.chat_node)
-workflow.set_entry_point("generate_itinerary")
-workflow.add_edge("generate_itinerary", END)
-workflow.add_edge("recommend_activities", END)
-workflow.add_edge("fetch_useful_links", END)
-workflow.add_edge("weather_forecaster", END)
-workflow.add_edge("packing_list_generator", END)
-workflow.add_edge("food_culture_recommender", END)
-workflow.add_edge("chat", END)
-graph = workflow.compile()
+graph = create_graph()
 
 # ------------------- UI -------------------
 
@@ -106,13 +75,11 @@ with col1:
         month = start_date.strftime("%B")
         st.info(f"여행 일수: {duration} days")
 
-    #month = st.selectbox("여행 계획 월", ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
-    #duration = st.slider("여행 일수", 1, 30, 7)
     num_people = st.number_input("여행 인원 수", min_value=1, max_value=10, value=2, step=1, help="여행에 참여할 인원 수를 입력하세요.")
 with col2:
-    holiday_type = st.selectbox("Holiday Type", ["Backpacking", "Family", "Adventure", "City Break", "Romantic", "Cruise"])
-    budget_type = st.selectbox("여행경비", ["Budget", "Mid-Range", "Backpacker", "Family"])
-    air_class = st.selectbox("항공 클래스", ["Economy", "Business", "First Class"])
+    holiday_type = st.selectbox("Holiday Type", ["Family", "City Tour", "Backpacking","Cruise"])
+    budget_type = st.selectbox("여행경비", [ "Mid-Range", "Economy", "Family"])
+    air_class = st.selectbox("항공 클래스", ["Economy", "Business"])
     daily_hotel_cost = st.number_input("일 숙박비 (USD)", min_value=0, value=200, step=50, help="예상 숙박비를 입력하세요.")
     example = """please recommend accomodations in the down town as possible and recommend me good  restaurants for dinning
 provide me approximate total budgets"""
