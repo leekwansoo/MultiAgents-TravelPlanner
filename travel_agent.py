@@ -107,6 +107,7 @@ with st.form("travel_form"):
             st.success(f"여행 시작일: {start_date}")
             st.success(f"여행 마지막 날: {end_date}")
             st.info(f"여행 일수: {duration} days")
+        submit_button = st.form_submit_button("여행일자입력")
 
         #month = st.selectbox("여행 계획 월", ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
         #duration = st.slider("여행 일수", 1, 30, 7)
