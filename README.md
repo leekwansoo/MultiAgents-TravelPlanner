@@ -2,7 +2,7 @@
 
 Welcome to the **AI Travel Itinerary Planner**, a modular multi-agent system built with Streamlit, LangGraph, and Ollama. This application leverages multiple AI agents to generate personalized travel itineraries and provide additional travel-related insights based on user preferences. The system is designed for modularity, with agents split into individual scripts for maintainability and scalability.
 
-- **Repository**: [https://github.com/vikrambhat2/MultiAgents-with-Langgraph-TravelItineraryPlanner](https://github.com/vikrambhat2/MultiAgents-with-Langgraph-TravelItineraryPlanner)
+- **Repository**: [https://github.com/leekwansoo/Travel_Planner](https://github.com/leekwansoo/Travel_Planner)
 
 
 ## Overview
