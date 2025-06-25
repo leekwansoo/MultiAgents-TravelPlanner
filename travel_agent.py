@@ -1,4 +1,5 @@
 import streamlit as st
+from datetime import date
 import json
 from typing import TypedDict, Annotated
 from langgraph.graph import StateGraph, END
@@ -72,7 +73,7 @@ graph = workflow.compile()
 
 # ------------------- UI -------------------
 
-st.markdown("# AI-Powered Travel Itinerary Planner")
+st.markdown("# AI-Powered Travel Planner")
 
 if "state" not in st.session_state:
     st.session_state.state = {
@@ -92,24 +93,43 @@ if "state" not in st.session_state:
 with st.form("travel_form"):
     col1, col2 = st.columns(2)
     with col1:
-        destination = st.text_input("Destination")
-        month = st.selectbox("Month of Travel", ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
-        duration = st.slider("Number of Days", 1, 30, 7)
-        num_people = st.selectbox("Number of People", ["1", "2", "3", "4-6", "7-10", "10+"])
+        destination = st.text_input("여행 목적지 (예: Paris, Tokyo 등)", placeholder="여행하고 싶은 도시나 국가를 입력하세요...")
+        origin = st.text_input("출발지", value="Inchon, Korea")
+        # Calendar widgets for selecting start and end dates
+        start_date = st.date_input("Select Start Date", value=date.today())
+        end_date = st.date_input("Select End Date", value=date.today())
+        # Ensure end_date is not before start_date
+        if start_date > end_date:
+            st.error("End date must be after start date.")
+        else:
+            duration = (end_date - start_date).days
+            month = start_date.strftime("%B")
+            st.success(f"여행 시작일: {start_date}")
+            st.success(f"여행 마지막 날: {end_date}")
+            st.info(f"여행 일수: {duration} days")
+
+        #month = st.selectbox("여행 계획 월", ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"])
+        #duration = st.slider("여행 일수", 1, 30, 7)
+        num_people = st.number_input("여행 인원 수", min_value=1, max_value=10, value=2, step=1, help="여행에 참여할 인원 수를 입력하세요.")
     with col2:
-        holiday_type = st.selectbox("Holiday Type", ["Any", "Party", "Skiing", "Backpacking", "Family", "Beach", "Festival", "Adventure", "City Break", "Romantic", "Cruise"])
-        budget_type = st.selectbox("Budget Type", ["Budget", "Mid-Range", "Luxury", "Backpacker", "Family"])
-        comments = st.text_area("Additional Comments")
-    submit_btn = st.form_submit_button("Generate Itinerary")
+        holiday_type = st.selectbox("Holiday Type", ["Backpacking", "Family", "Adventure", "City Break", "Romantic", "Cruise"])
+        budget_type = st.selectbox("여행경비", ["Budget", "Mid-Range", "Backpacker", "Family"])
+        air_class = st.selectbox("항공 클래스", ["Economy", "Business", "First Class"])
+        daily_hotel_cost = st.number_input("일 숙박비 (USD)", min_value=0, value=200, step=50, help="예상 숙박비를 입력하세요.")
+        comments = st.text_area("추가 사항 및 요청", placeholder="여행에 대한 추가 정보나 요청 사항을 입력하세요...")
+    submit_btn = st.form_submit_button("여행계획 출력")
 
 if submit_btn:
-    preferences_text = f"Destination: {destination}\nMonth: {month}\nDuration: {duration} days\nPeople: {num_people}\nType: {holiday_type}\nBudget: {budget_type}\nComments: {comments}"
+    preferences_text = f"Destination: {destination}\nOrigin: {origin}\nMonth: {month}\nDuration: {duration} days\nPeople: {num_people}\nType: {holiday_type}\nBudget: {budget_type}\nAir_class: {air_class}\nDaily_hotel_cost: {daily_hotel_cost}\nComments: {comments}"
     preferences = {
         "destination": destination,
+        "origin": origin,
         "month": month,
         "duration": duration,
         "num_people": num_people,
         "holiday_type": holiday_type,
+        "air_class": air_class,
+        "daily_hotel_cost": daily_hotel_cost,
         "budget_type": budget_type,
         "comments": comments
     }
